@@ -4,9 +4,12 @@ import cn.shijianka.reggie.common.R;
 import cn.shijianka.reggie.entity.Employee;
 import cn.shijianka.reggie.service.EmployeeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,20 +58,40 @@ public class EmployeeController {
         return R.success("退出成功");
 
     }
+
     //新增员工
     @PostMapping
-    public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
-        log.info("新增员工，员工信息：{}",employee.toString());
+    public R<String> save(HttpServletRequest request, @RequestBody Employee employee) {
+        log.info("新增员工，员工信息：{}", employee.toString());
         //设置初始密码123456，并且md5加密
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
 
         //获得当前用户的id
-        Long empId =(Long) request.getSession().getAttribute("employee");
+        Long empId = (Long) request.getSession().getAttribute("employee");
         employee.setCreateUser(empId);
         employee.setUpdateUser(empId);
         employeeService.save(employee);
         return R.success("新增员工成功");
+    }
+
+    /**
+     * 员工信息的分页查询
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        log.info("page={},pageSize={},name={}", page, pageSize, name);
+        //分页构造器
+        Page pageInfo = new Page(page, pageSize);
+        //条件构造器
+        LambdaQueryWrapper<Employee> lqw = new LambdaQueryWrapper<>();
+        //添加过滤条件
+        lqw.like(name!=null,Employee::getName,name);
+        //添加排序条件
+        lqw.orderByDesc(Employee::getUpdateTime);
+        //执行查询
+        employeeService.page(pageInfo,lqw);
+        return R.success(pageInfo);
     }
 }
