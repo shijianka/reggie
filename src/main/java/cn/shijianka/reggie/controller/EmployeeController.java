@@ -87,11 +87,29 @@ public class EmployeeController {
         //条件构造器
         LambdaQueryWrapper<Employee> lqw = new LambdaQueryWrapper<>();
         //添加过滤条件
-        lqw.like(name!=null,Employee::getName,name);
+        lqw.like(name != null, Employee::getName, name);
         //添加排序条件
         lqw.orderByDesc(Employee::getUpdateTime);
         //执行查询
-        employeeService.page(pageInfo,lqw);
+        employeeService.page(pageInfo, lqw);
         return R.success(pageInfo);
     }
+/**
+ * 根据员工id改变信息
+ */
+@PutMapping
+public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
+    log.info(employee.toString());
+    Long empId = (Long) request.getSession().getAttribute("employee");
+    employee.setUpdateTime(LocalDateTime.now());
+    employee.setUpdateUser(empId);
+    employeeService.updateById(employee);
+    return R.success("员工信息修改成功");
+}
+@GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id){
+    log.info("根据id查询信息。。。");
+    Employee employee = employeeService.getById(id);
+    return R.success(employee);
+}
 }
