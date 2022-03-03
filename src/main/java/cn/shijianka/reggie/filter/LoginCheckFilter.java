@@ -22,6 +22,7 @@ public class LoginCheckFilter  implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         //1：获取请求路径
         String requestURI = httpServletRequest.getRequestURI();
+        log.info("获取到请求路径：{}",requestURI);
         //2：检查路径是否在拦截目录
             //需要排除的路径排除
         String[] arr = new String[]{
@@ -34,17 +35,20 @@ public class LoginCheckFilter  implements Filter {
         //3：若是不在拦截目录放行，
         boolean check = check(arr, requestURI);
         if(check){
+            log.info("{}不在拦截目录内，已经放行",requestURI);
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
         //4：检查是否登录，已经登录则放行
             //session中查找
         if (httpServletRequest.getSession().getAttribute("employee")!=null) {
+            log.info("用户已经登录，放行");
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
 
         //5：未登录跳转登录 通过输出流的方式向客户端写响应数据
+        log.info("用户未登录，跳转登录页面...");
         httpServletResponse.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
         return;
 
