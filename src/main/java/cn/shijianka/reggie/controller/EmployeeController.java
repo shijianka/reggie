@@ -4,16 +4,14 @@ import cn.shijianka.reggie.common.R;
 import cn.shijianka.reggie.entity.Employee;
 import cn.shijianka.reggie.service.EmployeeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+
 
 @Slf4j
 @RestController
@@ -65,13 +63,13 @@ public class EmployeeController {
         log.info("新增员工，员工信息：{}", employee.toString());
         //设置初始密码123456，并且md5加密
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
+      /*  employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());*/
+/*
         //获得当前用户的id
         Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+       employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);*/
         employeeService.save(employee);
         return R.success("新增员工成功");
     }
@@ -94,22 +92,24 @@ public class EmployeeController {
         employeeService.page(pageInfo, lqw);
         return R.success(pageInfo);
     }
-/**
- * 根据员工id改变信息
- */
-@PutMapping
-public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
-    log.info(employee.toString());
-    Long empId = (Long) request.getSession().getAttribute("employee");
-    employee.setUpdateTime(LocalDateTime.now());
-    employee.setUpdateUser(empId);
-    employeeService.updateById(employee);
-    return R.success("员工信息修改成功");
-}
-@GetMapping("/{id}")
-    public R<Employee> getById(@PathVariable Long id){
-    log.info("根据id查询信息。。。");
-    Employee employee = employeeService.getById(id);
-    return R.success(employee);
-}
+
+    /**
+     * 根据员工id改变信息
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+        log.info(employee.toString());
+  /*   Long empId = (Long) request.getSession().getAttribute("employee");
+   employee.setUpdateTime(LocalDateTime.now());
+    employee.setUpdateUser(empId);*/
+        employeeService.updateById(employee);
+        return R.success("员工信息修改成功");
+    }
+
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id) {
+        log.info("根据id查询信息。。。");
+        Employee employee = employeeService.getById(id);
+        return R.success(employee);
+    }
 }
