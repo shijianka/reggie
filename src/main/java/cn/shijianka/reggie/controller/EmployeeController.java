@@ -1,5 +1,6 @@
 package cn.shijianka.reggie.controller;
 
+import cn.shijianka.reggie.common.BaseContext;
 import cn.shijianka.reggie.common.R;
 import cn.shijianka.reggie.entity.Employee;
 import cn.shijianka.reggie.service.EmployeeService;
@@ -46,6 +47,9 @@ public class EmployeeController {
         }
         //6. 登录成功，将员工id存入Session并返回成功结果
         request.getSession().setAttribute("employee", emp.getId());
+        /*long id = Thread.currentThread().getId();
+        log.info("(登陆成功)当前线程id:{}",id);
+        BaseContext.set(emp.getId());*/
         return R.success(emp);
     }
 
