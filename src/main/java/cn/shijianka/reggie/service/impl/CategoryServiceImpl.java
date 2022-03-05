@@ -1,5 +1,6 @@
 package cn.shijianka.reggie.service.impl;
 
+import cn.shijianka.reggie.common.CustomException;
 import cn.shijianka.reggie.entity.Category;
 import cn.shijianka.reggie.entity.Dish;
 import cn.shijianka.reggie.entity.Setmeal;
@@ -36,12 +37,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         int count1 = dishService.count(dishLambdaQueryWrapper);
         if(count1>0){
             //抛出业务异常
+            throw new CustomException("当前分类关联了菜品，不能删除");
         }
         //查询当前分类是否关联了套餐，如果已经关联，抛出一个业务异常
         int count2 = setmealService.count(setmealLambdaQueryWrapper);
         if(count2>0){
             //抛出业务异常
+            throw new CustomException("当前分类关联了套餐，不能删除");
         }
         //正常删除
+        super.removeById(id);
     }
 }
