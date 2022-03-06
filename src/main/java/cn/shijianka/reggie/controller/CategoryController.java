@@ -4,10 +4,13 @@ import cn.shijianka.reggie.common.R;
 import cn.shijianka.reggie.entity.Category;
 import cn.shijianka.reggie.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/category")
@@ -56,5 +59,16 @@ public class CategoryController {
         log.info("修改分类信息：{}",category);
         categoryService.updateById(category);
         return R.success("修改分类信息成功");
+    }
+
+    //根据条件查询分类数据
+    @GetMapping("/list")
+    public R<List<Category>>  list(Category category){
+        LambdaQueryWrapper<Category> lqw=new LambdaQueryWrapper();
+        lqw.eq(category.getType()!=null,Category::getType,category.getType());
+        //添加排序
+        lqw.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+        List<Category> list = categoryService.list(lqw);
+        return R.success(list);
     }
 }
