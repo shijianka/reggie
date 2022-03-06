@@ -1,5 +1,6 @@
 package cn.shijianka.reggie.service.impl;
 
+import cn.shijianka.reggie.dto.DishDto;
 import cn.shijianka.reggie.entity.DishFlavor;
 import cn.shijianka.reggie.mapper.DishFlavorMapper;
 import cn.shijianka.reggie.service.DishFlavorService;
@@ -8,4 +9,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFlavor> implements DishFlavorService {
+
 }
