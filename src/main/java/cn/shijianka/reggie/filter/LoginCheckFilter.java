@@ -30,7 +30,8 @@ public class LoginCheckFilter  implements Filter {
             "/employee/login",
             "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/common/**"
         };
 
         //3：若是不在拦截目录放行，
