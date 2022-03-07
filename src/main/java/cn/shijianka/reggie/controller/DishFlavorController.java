@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -72,5 +74,26 @@ public class DishFlavorController {
         pDishDto.setRecords(list);
 
         return R.success(pDishDto);
+    }
+    @GetMapping("/{id}")
+    public R<DishDto> update(@PathVariable Long id){
+        //获取Dish对象
+        Dish dish = dishService.getById(id);
+        //获取DishFlavor ? dishId==id
+        LambdaQueryWrapper<DishFlavor> lqw=new LambdaQueryWrapper<>();
+        lqw.eq(DishFlavor::getDishId,id);
+//        Map<String, Object> map = dishFlavorService.getMap(lqw);
+//        Set<String> set = map.keySet();
+//        for (String s : set) {
+//            Object o = map.get(s);
+//            log.info(s);
+//            log.info(o.toString());
+//        }
+        List<DishFlavor> list = dishFlavorService.list(lqw);
+        DishDto dishDto = new DishDto();
+        //拷贝dish中的数据
+        dishDto.setFlavors(list);
+        BeanUtils.copyProperties(dish,dishDto);
+        return R.success(dishDto);
     }
 }
