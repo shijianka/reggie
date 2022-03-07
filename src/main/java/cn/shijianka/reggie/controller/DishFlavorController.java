@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,25 +76,27 @@ public class DishFlavorController {
 
         return R.success(pDishDto);
     }
+
+    /**
+     * 数据回显
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
-    public R<DishDto> update(@PathVariable Long id){
-        //获取Dish对象
-        Dish dish = dishService.getById(id);
-        //获取DishFlavor ? dishId==id
-        LambdaQueryWrapper<DishFlavor> lqw=new LambdaQueryWrapper<>();
-        lqw.eq(DishFlavor::getDishId,id);
-//        Map<String, Object> map = dishFlavorService.getMap(lqw);
-//        Set<String> set = map.keySet();
-//        for (String s : set) {
-//            Object o = map.get(s);
-//            log.info(s);
-//            log.info(o.toString());
-//        }
-        List<DishFlavor> list = dishFlavorService.list(lqw);
-        DishDto dishDto = new DishDto();
-        //拷贝dish中的数据
-        dishDto.setFlavors(list);
-        BeanUtils.copyProperties(dish,dishDto);
+    public R<DishDto> update1(@PathVariable Long id){
+        DishDto dishDto = dishService.getWithFlavor(id);
         return R.success(dishDto);
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    @Transactional
+    public R<String> update2(@RequestBody DishDto dishDto){
+        dishService.updateWithFlavor(dishDto);
+        return R.success("修改成功");
     }
 }
