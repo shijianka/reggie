@@ -99,4 +99,18 @@ public class DishFlavorController {
         dishService.updateWithFlavor(dishDto);
         return R.success("修改成功");
     }
+
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+      //构造条件构造器
+        LambdaQueryWrapper<Dish> lqw=new LambdaQueryWrapper<>();
+        //查询分类为CategoryId的dish
+        lqw.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+        //按照sort降序
+        lqw.orderByDesc(Dish::getSort);
+        //起售状态
+        lqw.eq(Dish::getStatus,1);
+        //返回list集合
+        return R.success( dishService.list(lqw));
+    }
 }
