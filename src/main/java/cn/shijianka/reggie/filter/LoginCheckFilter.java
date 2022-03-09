@@ -43,7 +43,7 @@ public class LoginCheckFilter  implements Filter {
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
-        //4：检查员工是否登录，已经登录则放行
+        //4-1：检查员工是否登录，已经登录则放行
             //session中查找
         if (httpServletRequest.getSession().getAttribute("employee")!=null) {
             log.info("员工已经登录，放行");
@@ -53,7 +53,7 @@ public class LoginCheckFilter  implements Filter {
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
-        //4：检查用户是否登录，已经登录则放行
+        //4-2：检查用户是否登录，已经登录则放行
         //session中查找
         if (httpServletRequest.getSession().getAttribute("user")!=null) {
             log.info("用户已经登录，放行");

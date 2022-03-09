@@ -25,46 +25,55 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/sendMsg")
-    public R<String> sendMsg(@RequestBody User user, HttpServletRequest request){
+    public R<String> sendMsg(@RequestBody User user, HttpServletRequest request) {
         //注册或者已经存在，发送短信验证码
-            //生成验证码
+        //生成验证码
         Integer integerCode = ValidateCodeUtils.generateValidateCode(6);
-            //发送短信
+        //发送短信
         //定义短信发送工具类参数
-        String signName="传智健康";
-        String templateCode="SMS_175485149";
-        String phoneNumbers=user.getPhone();
-        String param=""+integerCode;
+        String signName = "传智健康";
+        String templateCode = "SMS_175485149";
+        String phoneNumbers = user.getPhone();
+        String param = "" + integerCode;
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getPhone,user.getPhone());
+        lqw.eq(User::getPhone, user.getPhone());
         User one = userService.getOne(lqw);
-        if(one==null){
+        if (one == null) {
             //新用户，先注册
             user.setStatus(1);
             userService.save(user);
         }
-        request.getSession().setAttribute("code",param);
-        SMSUtils.sendMessage(signName,templateCode,phoneNumbers,param);
-        return R.success("验证码已经发送到"+phoneNumbers);
+        request.getSession().setAttribute("code", param);
+        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);
+        return R.success("验证码已经发送到" + phoneNumbers);
     }
+
     @PostMapping("/login")
-    public R<UserDto> login(@RequestBody UserDto userDto,HttpServletRequest request){
+    public R<UserDto> login(@RequestBody UserDto userDto, HttpServletRequest request) {
         log.info(userDto.toString());
         String code = (String) request.getSession().getAttribute("code");
-        if(!(code!=null&& code.equals(userDto.getCode())) ){
+        if (!(code != null && code.equals(userDto.getCode()))) {
             return R.error("验证码不正确");
         }
         //验证码正确，如果用户未注册，顺便注册
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getPhone,userDto.getPhone());
+        lqw.eq(User::getPhone, userDto.getPhone());
         User one = userService.getOne(lqw);
-        if(one==null){
+        Long id = null;
+        if (one == null) {
             //新用户，先注册
             userDto.setStatus(1);
             userService.save(userDto);
+            User one1 = userService.getOne(lqw); //如果时新用户，则再查找一次//根据电话号码获得user对象
+            id = one1.getId();
+        } else {
+            id = one.getId();
         }
         //将用户的id存入session，过滤器相应的以此为标识
-        request.getSession().setAttribute("user",userDto.getId());
+
+        log.info("验证码正确，将user.id{}存入session", id);
+        request.getSession().setAttribute("user", id);
+        log.info(request.getSession().getAttribute("user").toString());
         return R.success(userDto);
     }
 }
