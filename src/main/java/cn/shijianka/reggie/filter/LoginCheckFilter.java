@@ -31,7 +31,9 @@ public class LoginCheckFilter  implements Filter {
             "/employee/logout",
                 "/backend/**",
                 "/front/**",
-                "/common/**"
+                "/common/**",
+                "/user/sendMsg",//移动端发送短信
+                "/user/login"//移动端登录
         };
 
         //3：若是不在拦截目录放行，
@@ -41,13 +43,21 @@ public class LoginCheckFilter  implements Filter {
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
-        //4：检查是否登录，已经登录则放行
+        //4：检查员工是否登录，已经登录则放行
             //session中查找
         if (httpServletRequest.getSession().getAttribute("employee")!=null) {
-            log.info("用户已经登录，放行");
+            log.info("员工已经登录，放行");
            /* long id = Thread.currentThread().getId();
             log.info("（拦截器）当前线程id:{}",id);*/
             BaseContext.set((Long)httpServletRequest.getSession().getAttribute("employee"));
+            chain.doFilter(httpServletRequest,httpServletResponse);
+            return;
+        }
+        //4：检查用户是否登录，已经登录则放行
+        //session中查找
+        if (httpServletRequest.getSession().getAttribute("user")!=null) {
+            log.info("用户已经登录，放行");
+            BaseContext.set((Long)httpServletRequest.getSession().getAttribute("user"));
             chain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
