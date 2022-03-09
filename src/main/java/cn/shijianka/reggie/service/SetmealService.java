@@ -4,6 +4,7 @@ import cn.shijianka.reggie.dto.SetmealDto;
 import cn.shijianka.reggie.entity.Setmeal;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 
 
 public interface SetmealService extends IService<Setmeal> {
@@ -12,4 +13,5 @@ public interface SetmealService extends IService<Setmeal> {
      * @param setmealDto
      */
     void addWithDish(SetmealDto setmealDto);
+    void removeWithDish(List<Long> ids);
 }

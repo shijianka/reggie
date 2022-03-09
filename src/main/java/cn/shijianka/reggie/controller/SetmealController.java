@@ -73,4 +73,11 @@ public class SetmealController {
         return R.success(setmealDtoPage);
 
     }
+
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info(ids.toString());
+        setmealService.removeWithDish(ids);
+        return R.success("删除成功");
+    }
 }
