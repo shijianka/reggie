@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -101,7 +102,7 @@ public class DishFlavorController {
     }
 
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
       //构造条件构造器
         LambdaQueryWrapper<Dish> lqw=new LambdaQueryWrapper<>();
         //查询分类为CategoryId的dish
@@ -110,7 +111,20 @@ public class DishFlavorController {
         lqw.orderByDesc(Dish::getSort);
         //起售状态
         lqw.eq(Dish::getStatus,1);
-        //返回list集合
-        return R.success( dishService.list(lqw));
+        //list集合
+        List<Dish> list = dishService.list(lqw);
+     List<DishDto>  dishDtoList= list.stream().map(dish2->{
+         DishDto dishDto = new DishDto();
+         BeanUtils.copyProperties(dish2,dishDto);
+         LambdaQueryWrapper<DishFlavor> lqwDishFlavor=new LambdaQueryWrapper<>();
+         lqwDishFlavor.eq(DishFlavor::getDishId,dish2.getId());
+         List<DishFlavor> dishFlavorList=dishFlavorService.list(lqwDishFlavor);
+
+         dishDto.setFlavors(dishFlavorList);
+         return dishDto;
+     }).collect(Collectors.toList());
+
+//        return R.success( dishService.list(lqw));
+        return R.success(dishDtoList);
     }
 }
