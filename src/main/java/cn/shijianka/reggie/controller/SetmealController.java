@@ -1,6 +1,7 @@
 package cn.shijianka.reggie.controller;
 
 import cn.shijianka.reggie.common.R;
+import cn.shijianka.reggie.dto.DishDto;
 import cn.shijianka.reggie.dto.SetmealDto;
 import cn.shijianka.reggie.entity.Category;
 import cn.shijianka.reggie.entity.Setmeal;
@@ -79,5 +80,16 @@ public class SetmealController {
         log.info(ids.toString());
         setmealService.removeWithDish(ids);
         return R.success("删除成功");
+    }
+
+    /**
+     * 根据条件查询套餐数据
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list( Setmeal setmeal){
+
+        return null;
     }
 }
