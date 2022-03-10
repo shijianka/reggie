@@ -20,7 +20,7 @@ public class UpLoadFileTest {
         String signName="阿里云短信测试";
         String templateCode="SMS_154950909";
         String phoneNumbers="15091542252";
-        String param="1357";
+        String param="9870";
         SMSUtils.sendMessage(signName,templateCode,phoneNumbers,param);
     }
     @Test
