@@ -31,21 +31,20 @@ public class UserController {
         Integer integerCode = ValidateCodeUtils.generateValidateCode(6);
         //发送短信
         //定义短信发送工具类参数
-        String signName = "传智健康";
-        String templateCode = "SMS_175485149";
+        /**
+         * 为了便于开发，绕过短信验证
+         */
+        System.out.println();
+        System.out.println("短信验证码为："+integerCode);
+        request.getSession().setAttribute("code", ""+integerCode);
+        System.out.println();
+       /* String signName = "阿里云短信测试";
+        String templateCode = "SMS_154950909";
         String phoneNumbers = user.getPhone();
         String param = "" + integerCode;
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getPhone, user.getPhone());
-        User one = userService.getOne(lqw);
-        if (one == null) {
-            //新用户，先注册
-            user.setStatus(1);
-            userService.save(user);
-        }
         request.getSession().setAttribute("code", param);
-        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);
-        return R.success("验证码已经发送到" + phoneNumbers);
+        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);*/
+        return R.success("验证码已经发送");
     }
 
     @PostMapping("/login")
