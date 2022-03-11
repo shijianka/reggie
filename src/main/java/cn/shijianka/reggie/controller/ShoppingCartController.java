@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,9 +21,17 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
 
+    /**
+     * 查看购物车
+     * @return
+     */
     @GetMapping("/list")
-    public R<List<Dish>> list() {
-        return null;
+    public R<List<ShoppingCart>> list() {
+        LambdaQueryWrapper<ShoppingCart> lqw= new LambdaQueryWrapper<>();
+        lqw.eq(ShoppingCart::getUserId,BaseContext.get());
+        lqw.orderByDesc(ShoppingCart::getCreateTime);
+        List<ShoppingCart> list = shoppingCartService.list(lqw);
+        return R.success(list);
     }
 
     @Transactional
@@ -47,6 +56,7 @@ public class ShoppingCartController {
         //如果已经存在，在当前数量的基础上加一
         if (one != null) {
             one.setNumber(one.getNumber() + 1);
+            one.setCreateTime(LocalDateTime.now());
             shoppingCartService.updateById(one);
         }
         //如果不存在，则添加到购物车，数量默认就是1
@@ -54,6 +64,7 @@ public class ShoppingCartController {
             shoppingCart.setNumber(1);
             one = shoppingCart;
             one.setUserId(userId);
+            one.setCreateTime(LocalDateTime.now());
             shoppingCartService.save(one);
         }
         return R.success(one);
