@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 80
 spring:
   application:
     #应用名称 , 可选
@@ -20,4 +20,4 @@ mybatis-plus:
     db-config:
       id-type: ASSIGN_ID
 reggie:
-  path: D:\
+  path: /usr/local/img/

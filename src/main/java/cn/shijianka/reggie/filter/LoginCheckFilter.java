@@ -27,6 +27,7 @@ public class LoginCheckFilter  implements Filter {
         //2：检查路径是否在拦截目录
             //需要排除的路径排除
         String[] arr = new String[]{
+                "/",
             "/employee/login",
             "/employee/logout",
                 "/backend/**",
