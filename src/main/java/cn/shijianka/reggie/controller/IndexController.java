@@ -18,4 +18,9 @@ public class IndexController {
         httpServletResponse.setStatus(302);
         httpServletResponse.setHeader("Location","/backend/index.html");
     }
+    @GetMapping("/{test}")
+    public void front(){
+        httpServletResponse.setStatus(302);
+        httpServletResponse.setHeader("Location","/front/index.html");
+    }
 }

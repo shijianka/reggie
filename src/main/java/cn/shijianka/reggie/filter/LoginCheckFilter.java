@@ -28,6 +28,7 @@ public class LoginCheckFilter  implements Filter {
             //需要排除的路径排除
         String[] arr = new String[]{
                 "/",
+                "/*",
             "/employee/login",
             "/employee/logout",
                 "/backend/**",
