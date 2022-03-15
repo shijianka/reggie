@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,5 +38,19 @@ public class OrderController {
         lqw.eq(Orders::getUserId,BaseContext.get());
         ordersService.page(ordersPage, lqw);
         return R.success(ordersPage);
+    }
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize,Long id){
+        Page<Orders> ordersPage = new Page<>(page,pageSize);
+        LambdaQueryWrapper<Orders> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(id!=null,Orders::getId,id);
+        lqw.orderByDesc(Orders::getOrderTime);
+        ordersService.page(ordersPage,lqw);
+        return R.success(ordersPage);
+    }
+    @PutMapping
+    public R<String> status(@RequestBody Orders orders){
+        ordersService.updateById(orders);
+        return R.success("派送成功！");
     }
 }
