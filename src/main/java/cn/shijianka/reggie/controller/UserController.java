@@ -31,19 +31,19 @@ public class UserController {
         Integer integerCode = ValidateCodeUtils.generateValidateCode(6);
         //发送短信
         //定义短信发送工具类参数
-        /**
-         * 为了便于开发，绕过短信验证
-         */
-        System.out.println();
-        System.out.println("短信验证码为："+integerCode);
-        request.getSession().setAttribute("code", ""+integerCode);
-        System.out.println();
-       /* String signName = "阿里云短信测试";
+//        /**
+//         * 为了便于开发，绕过短信验证
+//         */
+//        System.out.println();
+//        System.out.println("短信验证码为："+integerCode);
+//        request.getSession().setAttribute("code", ""+integerCode);
+//        System.out.println();
+        String signName = "阿里云短信测试";
         String templateCode = "SMS_154950909";
         String phoneNumbers = user.getPhone();
         String param = "" + integerCode;
         request.getSession().setAttribute("code", param);
-        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);*/
+        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);
         return R.success("验证码已经发送");
     }
 
