@@ -32,7 +32,7 @@ public class IndexController {
     public void index() {
         String header = httpServletRequest.getHeader("User-Agent");
         log.info(header);
-        if(header.contains("windows")){
+        if(header.contains("Win")){
             httpServletResponse.setStatus(302);
             httpServletResponse.setHeader("Location", "/backend/index.html");
         }else {
