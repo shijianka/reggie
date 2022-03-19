@@ -85,11 +85,11 @@ public class SetmealController {
     /**
      * 根据条件查询套餐数据
      * @param setmeal
-     * @return
+     * @returnw
      */
     @GetMapping("/list")
     public R<List<Setmeal>> list( Setmeal setmeal){
-
-        return null;
+        List<Setmeal> list = setmealService.list();
+        return R.success(list);
     }
 }

@@ -30,6 +30,7 @@ public class ShoppingCartController {
         LambdaQueryWrapper<ShoppingCart> lqw= new LambdaQueryWrapper<>();
         lqw.eq(ShoppingCart::getUserId,BaseContext.get());
         lqw.orderByDesc(ShoppingCart::getCreateTime);
+        lqw.gt(ShoppingCart::getNumber,0);
         List<ShoppingCart> list = shoppingCartService.list(lqw);
         return R.success(list);
     }
@@ -76,5 +77,17 @@ public class ShoppingCartController {
         lqw.eq(ShoppingCart::getUserId,BaseContext.get());
         shoppingCartService.remove(lqw);
         return R.success("清空成功");
+    }
+    @PostMapping("/sub")
+    public R<String> sub( @RequestBody  ShoppingCart shoppingCart ){
+        log.info("数量要减1的商品：" +shoppingCart);
+        LambdaQueryWrapper<ShoppingCart> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(shoppingCart.getSetmealId()!=null,ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
+        lqw.eq(shoppingCart.getDishId()!=null,ShoppingCart::getDishId,shoppingCart.getDishId());
+        ShoppingCart byId = shoppingCartService.getOne(lqw);
+        byId.setNumber(byId.getNumber()-1);
+        shoppingCartService.updateById(byId);
+        return R.success("");
+
     }
 }
