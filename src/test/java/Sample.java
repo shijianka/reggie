@@ -24,11 +24,11 @@ public class Sample {
         return new com.aliyun.dysmsapi20170525.Client(config);
     }
 
-    public static void main(String[] args_) throws Exception {
+    /*public static void main(String[] args_) throws Exception {
         java.util.List<String> args = java.util.Arrays.asList(args_);
         com.aliyun.dysmsapi20170525.Client client = Sample.createClient("LTAI5t8iYDNcZEfj8vhHpsQE", "W8xsSGAS2X3bxOH98DuKKjPMgOxGpR");
         SendSmsRequest sendSmsRequest = new SendSmsRequest();
         // 复制代码运行请自行打印 API 的返回值
         client.sendSms(sendSmsRequest);
-    }
+    }*/
 }
