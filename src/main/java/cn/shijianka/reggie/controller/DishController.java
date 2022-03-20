@@ -14,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,11 +33,16 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
         dishService.saveWithFlavor(dishDto);
+        //删除redis相同分类下的缓存
+        String key = "dish_"+dishDto.getCategoryId()+"_1";
+        redisTemplate.delete(key);
         return R.success("新增菜品成功");
     }
 
@@ -100,11 +108,25 @@ public class DishController {
     @Transactional
     public R<String> update2(@RequestBody DishDto dishDto) {
         dishService.updateWithFlavor(dishDto);
+        //删除redis相同分类下的缓存
+        String key = "dish_"+dishDto.getCategoryId()+"_1";
+        redisTemplate.delete(key);
         return R.success("修改成功");
     }
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish) {
+        //设计redis的key
+        String key = "dish_"+dish.getCategoryId()+"_"+dish.getStatus();
+        //从redis中查找数据
+        List<DishDto> result = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        //如果不为空，直接返回
+        if(result!=null){
+            return R.success(result);
+        }
+        //如果为空，查询数据库，然后添加进缓存
+            //如果为空继续往下执行
+
         //构造条件构造器
         LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
         //查询分类为CategoryId的dish
@@ -126,6 +148,8 @@ public class DishController {
             return dishDto;
         }).collect(Collectors.toList());
 
+        //从数据库中查找完成后，将数据添加进redis
+        redisTemplate.opsForValue().set(key,dishDtoList,1, TimeUnit.HOURS);
 //        return R.success( dishService.list(lqw));
         return R.success(dishDtoList);
     }

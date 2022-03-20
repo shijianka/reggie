@@ -1,21 +1,25 @@
 package cn.shijianka.reggie.controller;
 
+import cn.shijianka.reggie.common.BaseContext;
 import cn.shijianka.reggie.common.CustomException;
 import cn.shijianka.reggie.common.R;
 import cn.shijianka.reggie.dto.UserDto;
 import cn.shijianka.reggie.entity.User;
 import cn.shijianka.reggie.service.UserService;
+import cn.shijianka.reggie.utils.EmailUtils;
 import cn.shijianka.reggie.utils.SMSUtils;
 import cn.shijianka.reggie.utils.ValidateCodeUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -24,11 +28,18 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpServletRequest request) {
         //注册或者已经存在，发送短信验证码
         //生成验证码
         Integer integerCode = ValidateCodeUtils.generateValidateCode(6);
+     /*   //将生成的验证码保存到session中
+        request.getSession().setAttribute("code", integerCode+"");*/
+        //将生成的验证码缓存到redis中，并设置有效期5分钟
+        redisTemplate.opsForValue().set(user.getPhone(),integerCode+"",5, TimeUnit.MINUTES);
         //发送短信
         //定义短信发送工具类参数
 //        /**
@@ -38,19 +49,34 @@ public class UserController {
 //        System.out.println("短信验证码为："+integerCode);
 //        request.getSession().setAttribute("code", ""+integerCode);
 //        System.out.println();
-        String signName = "阿里云短信测试";
+        /**
+         * 短信发送验证码
+         */
+       /* String signName = "阿里云短信测试";
         String templateCode = "SMS_154950909";
         String phoneNumbers = user.getPhone();
         String param = "" + integerCode;
         request.getSession().setAttribute("code", param);
-        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);
+        SMSUtils.sendMessage(signName, templateCode, phoneNumbers, param);*/
+
+        /**
+         * 邮件发送验证码
+         */
+        String toAddress = "shijianka@foxmail.com";
+        String subject = "登录验证码";
+        String testBody = "您的验证码为："+integerCode+"\n该验证码五分钟内有效，请勿将验证码告知他人。";
+        EmailUtils.sendEmail(toAddress,subject,testBody);
+        log.info("登录验证码：{}",integerCode);
         return R.success("验证码已经发送");
     }
 
     @PostMapping("/login")
-    public R<UserDto> login(@RequestBody UserDto userDto, HttpServletRequest request) {
+    public R<String> login(@RequestBody UserDto userDto, HttpServletRequest request) {
         log.info(userDto.toString());
-        String code = (String) request.getSession().getAttribute("code");
+      /*  //从session中获取验证码
+        String code = (String) request.getSession().getAttribute("code");*/
+        //从redis中获取验证码
+        String code = (String) redisTemplate.opsForValue().get(userDto.getPhone());
         if (!(code != null && code.equals(userDto.getCode()))) {
             return R.error("验证码不正确");
         }
@@ -72,7 +98,9 @@ public class UserController {
 
         log.info("验证码正确，将user.id{}存入session", id);
         request.getSession().setAttribute("user", id);
+        //用户登录成功，删除Redis中缓存的验证码
+        redisTemplate.delete(userDto.getPhone());
         log.info(request.getSession().getAttribute("user").toString());
-        return R.success(userDto);
+        return R.success("登录成功");
     }
 }
